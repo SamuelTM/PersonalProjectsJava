@@ -71,11 +71,11 @@ public class Matriz2D {
         }
     }
 
+    /**
+     * Algoritmo basicão de multiplicação matricial. Acessa cada array
+     * m*n^2 vezes.
+     */
     public Matriz2D multiplicar(Matriz2D b) {
-        int acessosMatrizUm = 0;
-        int acessosMatrizDois = 0;
-        int acessosMatrizTres = 0;
-        BigInteger total = BigInteger.ZERO;
         if (nColunas == b.nLinhas) {
             double[] numeros = new double[nLinhas * b.nColunas];
 
@@ -83,43 +83,33 @@ public class Matriz2D {
                 for (int j = 0; j < b.nColunas; j++) {
                     for (int k = 0; k < nColunas; k++) {
                         numeros[i * b.nColunas + j] += getElemento(i, k) * b.getElemento(k, j);
-                        acessosMatrizUm++;
-                        acessosMatrizDois++;
-                        acessosMatrizTres++;
                     }
                 }
             }
-            total = total.add(BigInteger.valueOf(acessosMatrizUm)).add(BigInteger.valueOf(acessosMatrizUm))
-                    .add(BigInteger.valueOf(acessosMatrizTres));
-            System.out.println(acessosMatrizUm + "," + acessosMatrizDois + "," + acessosMatrizTres + "=" + total);
             return new Matriz2D(numeros, nLinhas, b.nColunas);
         } else {
             throw new IllegalArgumentException("Número de colunas de A deve ser igual ao número de linhas de B");
         }
     }
 
+    /**
+     * Algoritmo de multiplicação matricial que faz consideravelmente menos
+     * acessos à matriz resultante que o método tradicional. Enquanto o tradicional
+     * acessa a matriz resultante m*n^2 vezes, este acessa somente m*n vezes.
+     */
     public Matriz2D multiplicar2(Matriz2D b) {
-        int acessosMatrizUm = 0;
-        int acessosMatrizDois = 0;
-        int acessosMatrizTres = 0;
-        BigInteger total = BigInteger.ZERO;
         if (nColunas == b.nLinhas) {
             double[] numeros = new double[nLinhas * b.nColunas];
             for (int i = 0; i < numeros.length; i++) {
-                int linha = i / b.nColunas;
-                int coluna = i % b.nColunas;
+                int indiceLinha = i / b.nColunas;
+                int indiceColuna = i % b.nColunas;
                 double soma = 0;
                 for (int produtoVetorialAtual = 0; produtoVetorialAtual < b.nLinhas; produtoVetorialAtual++) {
-                    acessosMatrizUm++;
-                    acessosMatrizDois++;
-                    soma += getElemento(linha, produtoVetorialAtual) * b.getElemento(produtoVetorialAtual, coluna);
+                    soma += getElemento(indiceLinha, produtoVetorialAtual)
+                            * b.getElemento(produtoVetorialAtual, indiceColuna);
                 }
                 numeros[i] = soma;
-                acessosMatrizTres++;
             }
-            total = total.add(BigInteger.valueOf(acessosMatrizUm)).add(BigInteger.valueOf(acessosMatrizUm))
-                    .add(BigInteger.valueOf(acessosMatrizTres));
-            System.out.println(acessosMatrizUm + "," + acessosMatrizDois + "," + acessosMatrizTres + "=" + total);
 
             return new Matriz2D(numeros, nLinhas, b.nColunas);
         } else {
