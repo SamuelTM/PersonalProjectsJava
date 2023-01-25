@@ -3,12 +3,16 @@ package samueltm.projetospessoais.outros;
 public class Cronometro {
 
     private long tempoInicial;
-    private long tempoParado = -1;
+    private long tempoPausado = -1;
+
+    private boolean isPausado() {
+        return tempoPausado > -1;
+    }
 
     public void iniciar() {
         // se tá pausado, zera o tempo pausado
-        if (tempoParado > -1) {
-            tempoParado = -1;
+        if (isPausado()) {
+            tempoPausado = -1;
         } else if (tempoInicial <= 0) {
             // senão, o cronômetro deve estar zerado pra poder iniciar
             tempoInicial = System.nanoTime();
@@ -16,23 +20,26 @@ public class Cronometro {
     }
 
     public void parar() {
+        long tempoEmQueDeveParar = System.nanoTime();
         // se o cronômetro já não estiver parado
-        if (tempoInicial > 0 && tempoParado <= -1) {
-            tempoParado = System.nanoTime();
-        }
+        if (tempoInicial > 0 && !isPausado())
+            tempoPausado = tempoEmQueDeveParar;
     }
 
     public void zerar() {
         // se o cronômetro é zerado enquanto está pausado, zeramos o tempo pausado
         // e o tempo inicial. Se ele for zerado enquanto estiver correndo, zeramos
         // o tempo pausado porém o tempo inicial se torna o tempo atual
-        tempoInicial = tempoParado > -1 ? 0 : System.nanoTime();
-        tempoParado = -1;
+        tempoInicial = isPausado() ? 0 : System.nanoTime();
+        tempoPausado = -1;
     }
 
+    /**
+     * Retorna o tempo total decorrido em nanosegundos
+     */
     public long getTempoDecorrido() {
         if (tempoInicial > 0) {
-            return tempoParado > -1 ? tempoParado - tempoInicial : System.nanoTime() - tempoInicial;
+            return isPausado() ? tempoPausado - tempoInicial : System.nanoTime() - tempoInicial;
         } else {
             return 0;
         }

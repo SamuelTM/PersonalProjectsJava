@@ -22,10 +22,10 @@ public class CronometroTest {
     }
 
     @Test
-    public void testarPararCronometro() {
-        c.iniciar();
-
+    public void testarSeCronometroPermaneceParado() {
         int milisegundos = ThreadLocalRandom.current().nextInt(1000, 2000);
+
+        c.iniciar();
         esperar(milisegundos);
         c.parar();
 
@@ -36,31 +36,43 @@ public class CronometroTest {
     }
 
     @Test
-    public void testarIniciarZerarCronometro() {
-        boolean passou = true;
-        for (int i = 0; i < 100; i++) {
-            c.iniciar();
+    public void testarSeCronometroPermaneceZerado() {
+        int milisegundos = ThreadLocalRandom.current().nextInt(1000, 2000);
 
-            int milisegundos = ThreadLocalRandom.current().nextInt(1000, 2000);
-            esperar(milisegundos);
+        c.iniciar();
+        esperar(milisegundos);
+        c.parar();
+        c.zerar();
+
+        esperar(milisegundos);
+
+        assert (c.getTempoDecorrido() == 0);
+    }
+
+    @Test
+    public void testarIniciarZerarCronometro() {
+        for (int i = 0; i < 5; i++) {
+            int tempoPrimeiraEspera = ThreadLocalRandom.current().nextInt(1000, 2000);
+            int tempoSegundaEspera = ThreadLocalRandom.current().nextInt(1000, 2000);
+
+            c.iniciar();
+            esperar(tempoPrimeiraEspera);
             c.zerar();
 
-            milisegundos = ThreadLocalRandom.current().nextInt(1000, 2000);
-            esperar(milisegundos);
+            esperar(tempoSegundaEspera);
             c.parar();
 
-            long tempoDecorrido = c.getTempoDecorrido();
+            double tempoDecorridoMilisegundos = c.getTempoDecorrido() / 1e6;
             c.zerar();
 
-            passou = Math.abs(tempoDecorrido - (long) milisegundos + 1e6) <= 2e6;
-            System.out.println(passou);
+            double atualMenosEsperado = Math.abs(tempoDecorridoMilisegundos - (long) tempoSegundaEspera);
 
-            if (!passou) {
-                System.out.println(milisegundos);
-                System.out.println(tempoDecorrido);
-                break;
-            }
+            System.out.println("Era pra passar " + tempoSegundaEspera + "ms e se passaram "
+                    + tempoDecorridoMilisegundos);
+            System.out.println("Diferença de " + atualMenosEsperado + "ms");
+            System.out.println("-----------------");
+
+            assert (atualMenosEsperado <= 15);
         }
-        assert(passou);
     }
 }

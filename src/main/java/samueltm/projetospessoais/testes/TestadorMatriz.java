@@ -34,12 +34,12 @@ public class TestadorMatriz {
     }
 
     public static void testarAlgoritmosMultiplicacao() {
-        int m1 = ThreadLocalRandom.current().nextInt(1000,2000), n1 = ThreadLocalRandom.current().nextInt(2,11);
-        int n2 = ThreadLocalRandom.current().nextInt(1000,2000);
-        System.out.println(m1+","+n1+","+n2);
+        int m1 = ThreadLocalRandom.current().nextInt(1000, 2000);
+        int m2 = ThreadLocalRandom.current().nextInt(1000, 2000);
+        System.out.println(m1 + "," + m2);
         int amostra = 10;
-        Matriz2D a = gerarMatriz(m1, n1);
-        Matriz2D b = gerarMatriz(n1, n2);
+        Matriz2D a = gerarMatriz(m1, m2);
+        Matriz2D b = gerarMatriz(m2, m2);
         testarMultiplicacaoNormal(a, b).executarMedia("Multiplicação normal", amostra);
         testarMultiplicacaoMelhorada(a, b).executarMedia("Multiplicação nova", amostra);
     }
