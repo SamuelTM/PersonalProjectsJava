@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 public class Aleatoriedade {
 
-    public static <T> List<T> amostraPonderada(ColecaoAleatoria<T> colecao, int n) {
+    public static <T> List<T> amostraPonderada(ColecaoPonderada<T> colecao, int n) {
         List<T> resultado = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             resultado.add(colecao.proximo());
