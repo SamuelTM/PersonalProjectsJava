@@ -2,7 +2,10 @@ package samueltm.projetospessoais.matematica;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MatematicaGeral {
 
@@ -74,12 +77,12 @@ public class MatematicaGeral {
     }
 
     private static int minimoMultiploComum(int a, int b) {
-        return a * (b / maximoDivisorComum(a,b));
+        return a * (b / maximoDivisorComum(a, b));
     }
 
     public static int maximoDivisorComum(int... numeros) {
         int resultado = numeros[0];
-        for(int i = 1; i < numeros.length; i++) {
+        for (int i = 1; i < numeros.length; i++) {
             resultado = maximoDivisorComum(resultado, numeros[i]);
         }
         return resultado;
@@ -87,9 +90,15 @@ public class MatematicaGeral {
 
     public static int minimoMultiploComum(int... numeros) {
         int resultado = numeros[0];
-        for(int i = 1; i < numeros.length; i++) {
+        for (int i = 1; i < numeros.length; i++) {
             resultado = minimoMultiploComum(resultado, numeros[i]);
         }
         return resultado;
+    }
+
+    public static int raizDigital(int numero) {
+        if (numero <= 0) throw new IllegalArgumentException("Número deve ser positivo");
+        return numero >= 10 ? raizDigital(String.valueOf(numero).chars().mapToObj(i -> (char) i)
+                .mapToInt(Character::getNumericValue).sum()) : numero;
     }
 }
