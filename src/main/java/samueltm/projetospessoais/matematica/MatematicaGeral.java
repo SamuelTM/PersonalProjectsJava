@@ -98,6 +98,7 @@ public class MatematicaGeral {
 
     public static int raizDigital(int numero) {
         if (numero <= 0) throw new IllegalArgumentException("Número deve ser positivo");
+
         return numero >= 10 ? raizDigital(String.valueOf(numero).chars().mapToObj(i -> (char) i)
                 .mapToInt(Character::getNumericValue).sum()) : numero;
     }
