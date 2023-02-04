@@ -102,4 +102,8 @@ public class MatematicaGeral {
         return numero >= 10 ? raizDigital(String.valueOf(numero).chars().mapToObj(i -> (char) i)
                 .mapToInt(Character::getNumericValue).sum()) : numero;
     }
+
+    public static double arredondar(double numero, int nCasas) {
+        return Math.round(numero * Math.pow(10, nCasas)) / Math.pow(10, nCasas);
+    }
 }

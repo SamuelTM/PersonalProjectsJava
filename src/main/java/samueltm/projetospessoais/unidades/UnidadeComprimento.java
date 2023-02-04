@@ -11,7 +11,7 @@ public enum UnidadeComprimento {
     METRO(1),
     QUILOMETRO(1000),
     ANGSTROM(1e10),
-    ANO_LUZ(9.461e15),
+    ANO_LUZ( 9.46073e15),
     MILHA(1609.34),
     JARDA(0.9144),
     PE(0.3048),
