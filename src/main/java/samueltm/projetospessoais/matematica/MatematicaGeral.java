@@ -1,11 +1,10 @@
 package samueltm.projetospessoais.matematica;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MatematicaGeral {
 
@@ -104,6 +103,6 @@ public class MatematicaGeral {
     }
 
     public static double arredondar(double numero, int nCasas) {
-        return Math.round(numero * Math.pow(10, nCasas)) / Math.pow(10, nCasas);
+        return BigDecimal.valueOf(numero).setScale(nCasas, RoundingMode.HALF_EVEN).doubleValue();
     }
 }
