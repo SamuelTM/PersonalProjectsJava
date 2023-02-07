@@ -25,23 +25,23 @@ public class StringBuffer {
 
     public boolean contem(String s) {
         if (s.length() <= tamanho()) {
-            int previousPosition = cb.position();
-            int currIndex = 0;
-            boolean found = false;
+            int posicaoAnterior = cb.position();
+            int indiceAtual = 0;
+            boolean achou = false;
             while (cb.hasRemaining()) {
-                char current = cb.get();
-                if (current == s.charAt(currIndex)) {
-                    currIndex++;
-                    if (currIndex == s.length()) {
-                        found = true;
+                char atual = cb.get();
+                if (atual == s.charAt(indiceAtual)) {
+                    indiceAtual++;
+                    if (indiceAtual == s.length()) {
+                        achou = true;
                         break;
                     }
                 } else {
-                    currIndex = current == s.charAt(0) ? 1 : 0;
+                    indiceAtual = atual == s.charAt(0) ? 1 : 0;
                 }
             }
-            cb.position(previousPosition);
-            return found;
+            cb.position(posicaoAnterior);
+            return achou;
         } else {
             return false;
         }
@@ -51,8 +51,8 @@ public class StringBuffer {
         if (n > 0) {
             int contagem = 0;
             for (int i = 0; i < tamanho(); i++) {
-                char caractereAtual = cb.charAt(i);
-                if (caractereAtual == c) {
+                char atual = cb.charAt(i);
+                if (atual == c) {
                     contagem++;
                     if (contagem == n) {
                         return i;
