@@ -7,6 +7,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Aleatoriedade {
 
     public static <T> List<T> amostraPonderada(ColecaoPonderada<T> colecao, int n) {
+        if (colecao.getNumElementos() < n)
+            throw new IllegalArgumentException("Número de elementos menor que amostra desejada");
+        if (n < 1) throw new IllegalArgumentException("Tamanho da amostra deve ser positivo");
+
         List<T> resultado = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             resultado.add(colecao.proximo());

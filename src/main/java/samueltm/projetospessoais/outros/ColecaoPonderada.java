@@ -10,18 +10,23 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class ColecaoPonderada<E> {
 
-    private final NavigableMap<Double, E> map = new TreeMap<>();
-    private double total = 0;
+    private final NavigableMap<Double, E> elementos = new TreeMap<>();
+    private double pesoTotal = 0;
 
-    public ColecaoPonderada<E> adicionar(double peso, E resultado) {
+    public ColecaoPonderada<E> adicionar(double peso, E elemento) {
         if (peso <= 0) return this;
-        total += peso;
-        map.put(total, resultado);
+        pesoTotal += peso;
+        elementos.put(pesoTotal, elemento);
         return this;
     }
 
     public E proximo() {
-        double valor = ThreadLocalRandom.current().nextDouble() * total;
-        return map.higherEntry(valor).getValue();
+        double valor = ThreadLocalRandom.current().nextDouble() * pesoTotal;
+        return elementos.higherEntry(valor).getValue();
     }
+
+    public int getNumElementos() {
+        return elementos.size();
+    }
+
 }
