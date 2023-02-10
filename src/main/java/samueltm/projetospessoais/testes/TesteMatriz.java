@@ -5,7 +5,7 @@ import samueltm.projetospessoais.outros.Testador;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TestadorMatriz {
+public class TesteMatriz {
 
     public static Matriz2D gerarMatriz(int nLinhas, int nColunas) {
         double[] numeros = new double[nLinhas * nColunas];
