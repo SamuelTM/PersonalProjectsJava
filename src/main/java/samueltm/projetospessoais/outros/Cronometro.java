@@ -34,10 +34,7 @@ public class Cronometro {
         tempoPausado = -1;
     }
 
-    /**
-     * Retorna o tempo total decorrido em nanosegundos
-     */
-    public long getTempoDecorrido() {
+    public long getTempoDecorridoNano() {
         if (tempoInicial > 0) {
             return isPausado() ? tempoPausado - tempoInicial : System.nanoTime() - tempoInicial;
         } else {
@@ -46,6 +43,6 @@ public class Cronometro {
     }
 
     public String getTempoDecorridoFormatado() {
-        return Formatador.formatarNanosegundos(getTempoDecorrido());
+        return Formatador.formatarNanosegundos(getTempoDecorridoNano());
     }
 }

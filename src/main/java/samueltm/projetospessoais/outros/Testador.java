@@ -1,8 +1,5 @@
 package samueltm.projetospessoais.outros;
 
-import samueltm.projetospessoais.outros.Cronometro;
-import samueltm.projetospessoais.outros.Formatador;
-
 /**
  * Classe para fazer pequenos benchmarks de funções
  */
@@ -20,7 +17,7 @@ public abstract class Testador {
             c.iniciar();
             executarTeste();
             c.parar();
-            soma += c.getTempoDecorrido();
+            soma += c.getTempoDecorridoNano();
             c.zerar();
         }
         System.out.println("Função \"" + nomeTeste + "\" levou em média "

@@ -29,7 +29,7 @@ public class CronometroTest {
         esperar(milisegundos);
         c.parar();
 
-        String tempoDecorrido = String.valueOf(c.getTempoDecorrido());
+        String tempoDecorrido = String.valueOf(c.getTempoDecorridoNano());
         c.zerar();
 
         assert (tempoDecorrido.startsWith(String.valueOf(milisegundos).substring(0, 3)));
@@ -46,7 +46,7 @@ public class CronometroTest {
 
         esperar(milisegundos);
 
-        assert (c.getTempoDecorrido() == 0);
+        assert (c.getTempoDecorridoNano() == 0);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class CronometroTest {
             esperar(tempoSegundaEspera);
             c.parar();
 
-            double tempoDecorridoMilisegundos = c.getTempoDecorrido() / 1e6;
+            double tempoDecorridoMilisegundos = c.getTempoDecorridoNano() / 1e6;
             c.zerar();
 
             double atualMenosEsperado = Math.abs(tempoDecorridoMilisegundos - (long) tempoSegundaEspera);
