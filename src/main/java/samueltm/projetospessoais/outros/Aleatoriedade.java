@@ -19,6 +19,7 @@ public class Aleatoriedade {
         return resultado;
     }
 
+
     public static <T> List<T> amostraSimples(List<T> elementos, int tamanhoAmostra) {
         if (elementos.size() < tamanhoAmostra)
             throw new IllegalArgumentException("Número de elementos menor que amostra desejada");
@@ -27,13 +28,11 @@ public class Aleatoriedade {
         List<T> resultado = new ArrayList<>();
 
         for (int i = 0; i < elementos.size(); i++) {
-            if (resultado.size() < tamanhoAmostra) {
+            int quantosPrecisamos = tamanhoAmostra - resultado.size();
+            int quantoAindaTemos = elementos.size() - i;
+            double probabilidade = (double) quantosPrecisamos / quantoAindaTemos;
+            if (ThreadLocalRandom.current().nextDouble() <= probabilidade) {
                 resultado.add(elementos.get(i));
-            } else {
-                int indiceAleatorio = ThreadLocalRandom.current().nextInt(i + 1);
-                if (indiceAleatorio < tamanhoAmostra) {
-                    resultado.set(indiceAleatorio, elementos.get(i));
-                }
             }
         }
         return resultado;
@@ -47,13 +46,11 @@ public class Aleatoriedade {
         List<T> resultado = new ArrayList<>();
 
         for (int i = 0; i < elementos.length; i++) {
-            if (resultado.size() < tamanhoAmostra) {
+            int quantosPrecisamos = tamanhoAmostra - resultado.size();
+            int quantoAindaTemos = elementos.length - i;
+            double probabilidade = (double) quantosPrecisamos / quantoAindaTemos;
+            if (ThreadLocalRandom.current().nextDouble() <= probabilidade) {
                 resultado.add(elementos[i]);
-            } else {
-                int indiceAleatorio = ThreadLocalRandom.current().nextInt(i + 1);
-                if (indiceAleatorio < tamanhoAmostra) {
-                    resultado.set(indiceAleatorio, elementos[i]);
-                }
             }
         }
         return resultado;

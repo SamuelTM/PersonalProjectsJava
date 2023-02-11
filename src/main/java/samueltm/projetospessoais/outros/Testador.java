@@ -7,7 +7,14 @@ public abstract class Testador {
 
     public abstract void executarTeste();
 
-    public final void executarMedia(String nomeTeste, int numVezes) {
+    /**
+     * Executa o teste o número especificado de vezes pra conseguir
+     * o tempo de execução médio
+     * @param nomeTeste o nome que identifica o teste para conveniência
+     * @param numVezes o número de vezes que o teste será executado pra tirar a média
+     * @return o tempo de execução médio em nanosegundos
+     */
+    public final long executarMedia(String nomeTeste, int numVezes) {
         if (numVezes < 1)
             throw new IllegalArgumentException("Número de vezes deve ser maior que zero");
         System.out.println("Executando função: " + nomeTeste);
@@ -20,11 +27,13 @@ public abstract class Testador {
             soma += c.getTempoDecorridoNano();
             c.zerar();
         }
+        soma = soma / numVezes;
         System.out.println("Função \"" + nomeTeste + "\" levou em média "
-                + Formatador.formatarNanosegundos(soma / numVezes));
+                + Formatador.formatarNanosegundos(soma));
+        return soma;
     }
 
-    public final void executarUmaVez(String nomeTeste) {
-        executarMedia(nomeTeste, 1);
+    public final long executarUmaVez(String nomeTeste) {
+        return executarMedia(nomeTeste, 1);
     }
 }
