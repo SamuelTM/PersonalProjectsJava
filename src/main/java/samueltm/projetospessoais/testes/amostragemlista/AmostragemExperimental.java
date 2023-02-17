@@ -1,7 +1,5 @@
 package samueltm.projetospessoais.testes.amostragemlista;
 
-import samueltm.projetospessoais.outros.Aleatoriedade;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,11 +13,12 @@ public class AmostragemExperimental extends MetodoAmostragem{
     @Override
     public List<Integer> amostrarElementos() {
         List<Integer> resultado = new ArrayList<>();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         for (int i = 0; i < getElementos().length; i++) {
             int quantosPrecisamos = getTamanhoAmostra() - resultado.size();
             int quantoAindaTemos = getElementos().length - i;
             double probabilidade = (double) quantosPrecisamos / quantoAindaTemos;
-            if (ThreadLocalRandom.current().nextDouble() <= probabilidade) {
+            if (random.nextDouble() <= probabilidade) {
                 resultado.add(getElementos()[i]);
             }
         }

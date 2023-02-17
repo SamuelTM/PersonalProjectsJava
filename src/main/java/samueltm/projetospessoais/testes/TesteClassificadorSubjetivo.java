@@ -29,7 +29,7 @@ public class TesteClassificadorSubjetivo {
         }
         System.out.println("---------------------------");
 
-        List<Integer> itensOrdenados = new ArrayList<>(cs.getListaItens().keySet().stream().toList());
+        List<Integer> itensOrdenados = new ArrayList<>(cs.getListaItens().keySet());
         itensOrdenados.sort(Comparator.comparing(o -> cs.getListaItens().get(o)));
         Collections.reverse(itensOrdenados);
 

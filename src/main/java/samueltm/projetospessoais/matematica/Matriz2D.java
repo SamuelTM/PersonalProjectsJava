@@ -1,6 +1,5 @@
 package samueltm.projetospessoais.matematica;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -105,6 +104,8 @@ public class Matriz2D {
                 int indiceColuna = i % b.nColunas;
                 double soma = 0;
                 for (int produtoVetorialAtual = 0; produtoVetorialAtual < b.nLinhas; produtoVetorialAtual++) {
+                    System.out.println(getElemento(indiceLinha, produtoVetorialAtual) + " * "
+                            + b.getElemento(produtoVetorialAtual, indiceColuna));
                     soma += getElemento(indiceLinha, produtoVetorialAtual)
                             * b.getElemento(produtoVetorialAtual, indiceColuna);
                 }
@@ -172,11 +173,8 @@ public class Matriz2D {
     public Matriz2D getLinha(int indiceLinha) {
         if (indiceLinha >= 0 && indiceLinha < nLinhas) {
             double[] numeros = new double[nColunas];
-            int indiceInicial = indiceLinha * nColunas;
-            int contador = 0;
-            for (int i = indiceInicial; i < indiceInicial + nColunas; i++) {
-                numeros[contador] = matrizAchatada[i];
-                contador++;
+            for (int i = 0; i < numeros.length; i++) {
+                numeros[i] = getElemento(indiceLinha, i);
             }
             return new Matriz2D(numeros, 1, nColunas);
         } else {
@@ -186,16 +184,13 @@ public class Matriz2D {
 
     public Matriz2D getColuna(int indiceColuna) {
         if (indiceColuna >= 0 && indiceColuna < nColunas) {
-            double[] numeros = new double[nColunas];
-            int indiceFinal = (indiceColuna + (nColunas * (nLinhas - 1))) + 1;
-            int contador = 0;
-            for (int i = indiceColuna; i < indiceFinal; i += nColunas) {
-                numeros[contador] = matrizAchatada[i];
-                contador++;
+            double[] numeros = new double[nLinhas];
+            for (int i = 0; i < numeros.length; i++) {
+                numeros[i] = getElemento(i, indiceColuna);
             }
             return new Matriz2D(numeros, nLinhas, 1);
         } else {
-            throw new IndexOutOfBoundsException("Índice da coluna fora dos limites");
+            throw new IndexOutOfBoundsException("Índice da linha fora dos limites");
         }
     }
 
