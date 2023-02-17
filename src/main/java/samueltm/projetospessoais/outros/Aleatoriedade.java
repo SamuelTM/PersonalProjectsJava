@@ -1,6 +1,7 @@
 package samueltm.projetospessoais.outros;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,12 +27,13 @@ public class Aleatoriedade {
         if (tamanhoAmostra < 1) throw new IllegalArgumentException("Tamanho da amostra deve ser positivo");
 
         List<T> resultado = new ArrayList<>();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
 
         for (int i = 0; i < elementos.size(); i++) {
             int quantosPrecisamos = tamanhoAmostra - resultado.size();
             int quantoAindaTemos = elementos.size() - i;
             double probabilidade = (double) quantosPrecisamos / quantoAindaTemos;
-            if (ThreadLocalRandom.current().nextDouble() <= probabilidade) {
+            if (random.nextDouble() <= probabilidade) {
                 resultado.add(elementos.get(i));
             }
         }
@@ -39,21 +41,7 @@ public class Aleatoriedade {
     }
 
     public static <T> List<T> amostraSimples(T[] elementos, int tamanhoAmostra) {
-        if (elementos.length < tamanhoAmostra)
-            throw new IllegalArgumentException("Número de elementos menor que amostra desejada");
-        if (tamanhoAmostra < 1) throw new IllegalArgumentException("Tamanho da amostra deve ser positivo");
-
-        List<T> resultado = new ArrayList<>();
-
-        for (int i = 0; i < elementos.length; i++) {
-            int quantosPrecisamos = tamanhoAmostra - resultado.size();
-            int quantoAindaTemos = elementos.length - i;
-            double probabilidade = (double) quantosPrecisamos / quantoAindaTemos;
-            if (ThreadLocalRandom.current().nextDouble() <= probabilidade) {
-                resultado.add(elementos[i]);
-            }
-        }
-        return resultado;
+        return amostraSimples(Arrays.asList(elementos), tamanhoAmostra);
     }
 
     public static <T> T elementoAleatorio(List<T> lista) {
