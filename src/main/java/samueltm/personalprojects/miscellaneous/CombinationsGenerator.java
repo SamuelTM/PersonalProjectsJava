@@ -66,7 +66,7 @@ public class CombinationsGenerator implements Iterator<Integer[]> {
         return a;
     }
 
-    public BigInteger getTotal() {
+    public BigInteger getTotalPossibleCombinations() {
         return total;
     }
 }

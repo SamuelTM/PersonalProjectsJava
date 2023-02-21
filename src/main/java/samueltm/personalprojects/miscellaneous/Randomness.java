@@ -21,6 +21,10 @@ public class Randomness {
     }
 
 
+    /*
+        This method is very efficient when the sample size is tiny
+        when compared to the population size
+     */
     public static <T> List<T> simpleSampling(List<T> elements, int sampleSize) {
         if (elements.size() < sampleSize)
             throw new IllegalArgumentException("Number of elements smaller than sample size");
@@ -29,13 +33,16 @@ public class Randomness {
         List<T> result = new ArrayList<>();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        for (int i = 0; i < elements.size(); i++) {
-            int howMuchWeNeed = sampleSize - result.size();
-            int howMuchWeHaveLeft = elements.size() - i;
+        int howMuchWeNeed = sampleSize;
+        int howMuchWeHaveLeft = elements.size();
+
+        while(result.size() < sampleSize && howMuchWeHaveLeft > 0) {
             double probability = (double) howMuchWeNeed / howMuchWeHaveLeft;
             if (random.nextDouble() <= probability) {
-                result.add(elements.get(i));
+                result.add(elements.get(elements.size() - howMuchWeHaveLeft));
+                howMuchWeNeed--;
             }
+            howMuchWeHaveLeft--;
         }
         return result;
     }

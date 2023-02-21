@@ -202,8 +202,8 @@ public class Matrix2D {
         return new Matrix2D(flatMatrix, 1, nRows * nColumns);
     }
 
-    public Matrix2D reshape(int nLinhas, int nColunas) {
-        return new Matrix2D(flatMatrix, nLinhas, nColunas);
+    public Matrix2D reshape(int nRows, int nColumns) {
+        return new Matrix2D(flatMatrix, nRows, nColumns);
     }
 
     public Matrix2D copy() {
