@@ -6,8 +6,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ReservoirSampling extends SamplingMethod {
 
-    public ReservoirSampling(Integer[] elements, int sampleSize, int numberExecutions) {
-        super(elements, sampleSize, numberExecutions);
+    public ReservoirSampling(Integer[] elements, int sampleSize) {
+        super(elements, sampleSize);
     }
 
     @Override

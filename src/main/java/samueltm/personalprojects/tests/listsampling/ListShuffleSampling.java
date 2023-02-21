@@ -8,8 +8,8 @@ import java.util.stream.IntStream;
 public class ListShuffleSampling extends SamplingMethod {
 
 
-    public ListShuffleSampling(Integer[] elements, int sampleSize, int numberExecutions) {
-        super(elements, sampleSize, numberExecutions);
+    public ListShuffleSampling(Integer[] elements, int sampleSize) {
+        super(elements, sampleSize);
     }
 
     @Override

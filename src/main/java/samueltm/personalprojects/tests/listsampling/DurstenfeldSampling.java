@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 public class DurstenfeldSampling extends SamplingMethod {
 
-    public DurstenfeldSampling(Integer[] elements, int sampleSize, int numberExecutions) {
-        super(elements, sampleSize, numberExecutions);
+    public DurstenfeldSampling(Integer[] elements, int sampleSize) {
+        super(elements, sampleSize);
     }
 
     @Override

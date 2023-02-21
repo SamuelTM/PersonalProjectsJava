@@ -6,8 +6,8 @@ import java.util.List;
 
 public class ExperimentalSampling extends SamplingMethod {
 
-    public ExperimentalSampling(Integer[] elements, int sampleSize, int numberExecutions) {
-        super(elements, sampleSize, numberExecutions);
+    public ExperimentalSampling(Integer[] elements, int sampleSize) {
+        super(elements, sampleSize);
     }
 
     @Override
