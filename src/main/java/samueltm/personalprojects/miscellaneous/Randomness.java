@@ -36,7 +36,7 @@ public class Randomness {
         int howMuchWeNeed = sampleSize;
         int howMuchWeHaveLeft = elements.size();
 
-        while(result.size() < sampleSize && howMuchWeHaveLeft > 0) {
+        while(howMuchWeNeed > 0 && howMuchWeHaveLeft > 0) {
             double probability = (double) howMuchWeNeed / howMuchWeHaveLeft;
             if (random.nextDouble() <= probability) {
                 result.add(elements.get(elements.size() - howMuchWeHaveLeft));
