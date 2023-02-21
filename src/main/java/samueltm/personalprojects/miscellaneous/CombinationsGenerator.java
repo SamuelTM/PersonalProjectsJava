@@ -3,10 +3,11 @@ package samueltm.personalprojects.miscellaneous;
 import samueltm.personalprojects.math.GeneralMath;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
-public class CombinationsGenerator {
+public class CombinationsGenerator implements Iterator<Integer[]> {
 
-    private final int[] a;
+    private final Integer[] a;
     private final int n;
     private final int r;
     private BigInteger numCombinationsLeft;
@@ -21,7 +22,7 @@ public class CombinationsGenerator {
         }
         this.n = n;
         this.r = r;
-        a = new int[r];
+        a = new Integer[r];
         BigInteger nFactorial = GeneralMath.factorial(n);
         BigInteger rFactorial = GeneralMath.factorial(r);
         BigInteger differenceFactorial = GeneralMath.factorial(n - r);
@@ -40,16 +41,13 @@ public class CombinationsGenerator {
         return numCombinationsLeft.compareTo(BigInteger.ZERO) > 0;
     }
 
-    public BigInteger getTotal() {
-        return total;
-    }
-
     /**
-     * For huge number of combinations, it isn't viable to simply return a list with
-     * all possible combinations. So we use a (sort of) iterator to return one
+     * For huge number of possible combinations, it isn't viable to simply return
+     * a list of all possible combinations. So we use an iterator to return one
      * possible result at a time.
      */
-    public int[] getNext() {
+    @Override
+    public Integer[] next() {
         if (numCombinationsLeft.equals(total)) {
             numCombinationsLeft = numCombinationsLeft.subtract(BigInteger.ONE);
             return a;
@@ -66,5 +64,9 @@ public class CombinationsGenerator {
 
         numCombinationsLeft = numCombinationsLeft.subtract(BigInteger.ONE);
         return a;
+    }
+
+    public BigInteger getTotal() {
+        return total;
     }
 }
