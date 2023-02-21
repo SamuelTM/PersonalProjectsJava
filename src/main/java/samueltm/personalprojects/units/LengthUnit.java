@@ -1,7 +1,7 @@
 package samueltm.personalprojects.units;
 
 public enum LengthUnit {
-    PLANCK(1.61605e-35),
+    PLANCK(1.6161e-35),
     FEMTOMETER(1e-15),
     PICOMETER(1e-12),
     NANOMETER(1e-9),
@@ -11,7 +11,7 @@ public enum LengthUnit {
     METER(1),
     KILOMETER(1000),
     ANGSTROM(1e10),
-    LIGHT_YEAR( 9.46073e15),
+    LIGHT_YEAR( 9.4607e15),
     MILE(1609.34),
     YARD(0.9144),
     FOOT(0.3048),

@@ -3,7 +3,7 @@ package samueltm.personalprojects.math;
 public class Statistics {
 
     /**
-     * Normaliza o valor especificado para um valor compreendido entre 0 e 1
+     * Normalizes the specified value to a value between 0 and 1
      */
     public static double normalize(double value, double currentUpperBound, double currentLowerBound) {
         return (value - currentLowerBound) / (currentUpperBound - currentLowerBound);
