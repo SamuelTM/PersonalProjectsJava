@@ -23,7 +23,7 @@ public class Randomness {
 
     /*
         This method is very efficient when the sample size is tiny
-        when compared to the population size
+        in relation to the population size
      */
     public static <T> List<T> simpleSampling(List<T> elements, int sampleSize) {
         if (elements.size() < sampleSize)
