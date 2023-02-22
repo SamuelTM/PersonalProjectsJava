@@ -1,5 +1,7 @@
 package samueltm.personalprojects.miscellaneous;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,43 +9,42 @@ import java.util.Iterator;
 public class SubjectiveClassifier {
 
     private final HashMap<Integer, Double> opponentsList;
-    private final Iterator<Integer[]> contests;
+    private final Iterator<ImmutablePair<Integer, Integer>> contests;
 
     public SubjectiveClassifier(int nItems) {
         this.opponentsList = new HashMap<>();
 
-        ArrayList<Integer[]> contestsList = new ArrayList<>();
+        ArrayList<ImmutablePair<Integer, Integer>> contestsList = new ArrayList<>();
         for (int i = 0; i < nItems; i++) {
             if (opponentsList.containsKey(i)) throw new RuntimeException("Each item in the list must be unique");
             opponentsList.put(i, 1000.0);
 
             for (int j = i + 1; j < nItems; j++) {
-                contestsList.add(new Integer[]{i, j});
+                contestsList.add(new ImmutablePair<>(i, j));
             }
         }
 
         this.contests = contestsList.iterator();
     }
 
-    public Integer[] getNextContestIndices() {
+    public ImmutablePair<Integer, Integer> getNextContestIndices() {
         if (contests.hasNext()) {
             return contests.next();
         } else {
-            return new Integer[]{};
+            return null;
         }
     }
 
-    public void vote(Integer[] opponentsIndices, boolean firstOpponentWins) {
-        if (opponentsIndices.length != 2) throw new IllegalArgumentException("Invalid amount of opponents");
-        for(int opponentIndex : opponentsIndices) {
+    public void vote(ImmutablePair<Integer, Integer> opponentsIndices, boolean firstOpponentWins) {
+        for(int opponentIndex : new int[]{opponentsIndices.getLeft(), opponentsIndices.getRight()}) {
             if (opponentIndex < 0 || opponentIndex >= opponentsList.size())
                 throw new IllegalArgumentException("Invalid indices for the opponents");
         }
-        double[] newScores = EloScore.calculateScore(opponentsList.get(opponentsIndices[0]),
-                opponentsList.get(opponentsIndices[1]), 30, firstOpponentWins);
+        ImmutablePair<Double, Double> newScores = EloScore.calculateScore(opponentsList.get(opponentsIndices.getLeft()),
+                opponentsList.get(opponentsIndices.getRight()), 30, firstOpponentWins);
 
-        opponentsList.put(opponentsIndices[0], newScores[0]);
-        opponentsList.put(opponentsIndices[1], newScores[1]);
+        opponentsList.put(opponentsIndices.getLeft(), newScores.getLeft());
+        opponentsList.put(opponentsIndices.getRight(), newScores.getRight());
     }
 
     public HashMap<Integer, Double> getOpponentsList() {
