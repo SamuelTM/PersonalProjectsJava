@@ -10,7 +10,7 @@ public class CombinationsGenerator implements Iterator<Integer[]> {
     private final Integer[] a;
     private final int n;
     private final int r;
-    private BigInteger numCombinationsLeft;
+    private BigInteger nCombinationsLeft;
     private final BigInteger total;
 
     public CombinationsGenerator(int n, int r) {
@@ -34,11 +34,11 @@ public class CombinationsGenerator implements Iterator<Integer[]> {
         for (int i = 0; i < a.length; i++) {
             a[i] = i;
         }
-        numCombinationsLeft = new BigInteger(total.toString());
+        nCombinationsLeft = new BigInteger(total.toString());
     }
 
     public boolean hasNext() {
-        return numCombinationsLeft.compareTo(BigInteger.ZERO) > 0;
+        return nCombinationsLeft.compareTo(BigInteger.ZERO) > 0;
     }
 
     /**
@@ -48,8 +48,8 @@ public class CombinationsGenerator implements Iterator<Integer[]> {
      */
     @Override
     public Integer[] next() {
-        if (numCombinationsLeft.equals(total)) {
-            numCombinationsLeft = numCombinationsLeft.subtract(BigInteger.ONE);
+        if (nCombinationsLeft.equals(total)) {
+            nCombinationsLeft = nCombinationsLeft.subtract(BigInteger.ONE);
             return a;
         }
 
@@ -62,7 +62,7 @@ public class CombinationsGenerator implements Iterator<Integer[]> {
             a[j] = a[i] + j - i;
         }
 
-        numCombinationsLeft = numCombinationsLeft.subtract(BigInteger.ONE);
+        nCombinationsLeft = nCombinationsLeft.subtract(BigInteger.ONE);
         return a;
     }
 

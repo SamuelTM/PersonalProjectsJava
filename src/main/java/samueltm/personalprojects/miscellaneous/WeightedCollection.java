@@ -1,5 +1,6 @@
 package samueltm.personalprojects.miscellaneous;
 
+import java.awt.*;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -27,6 +28,17 @@ public class WeightedCollection<E> {
 
     public int getNumElements() {
         return elements.size();
+    }
+
+    public static <T> WeightedCollection<T> generateFrom(T[] elementArray, Double[] weights) {
+        if (elementArray.length != weights.length)
+            throw new IllegalArgumentException("The number of weights must be equal to the number of elements");
+        WeightedCollection<T> weightedCollection = new WeightedCollection<>();
+        for (int i = 0; i < elementArray.length; i++) {
+            weightedCollection.add(weights[i], elementArray[i]);
+        }
+
+        return weightedCollection;
     }
 
 }

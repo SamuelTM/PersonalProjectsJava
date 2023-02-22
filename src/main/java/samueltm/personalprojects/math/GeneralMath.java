@@ -95,6 +95,22 @@ public class GeneralMath {
         return result;
     }
 
+    public static double greatestValue(double... numbers) {
+        double greatest = numbers[0];
+        for (int i = 1; i < numbers.length; i++) {
+            greatest = Math.max(greatest, numbers[i]);
+        }
+        return greatest;
+    }
+
+    public static double lowestValue(double... numbers) {
+        double lowest = numbers[0];
+        for (int i = 1; i < numbers.length; i++) {
+            lowest = Math.min(lowest, numbers[i]);
+        }
+        return lowest;
+    }
+
     public static int digitalRoot(int number) {
         if (number <= 0) throw new IllegalArgumentException("Number must be positive");
 
