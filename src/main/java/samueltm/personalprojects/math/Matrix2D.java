@@ -118,7 +118,7 @@ public class Matrix2D {
      * accesses it only m*n times.
      */
 
-    public Matrix2D improvedMultiply(Matrix2D b) {
+    private Matrix2D improvedMultiply(Matrix2D b) {
         if (nColumns == b.nRows) {
             Matrix2D bT = b.transpose();
             double[] numbers = new double[nRows * b.nColumns];
@@ -211,7 +211,7 @@ public class Matrix2D {
         };
     }
 
-    public Matrix2D coppersmithWinograd(Matrix2D b) {
+    private Matrix2D coppersmithWinograd(Matrix2D b) {
         if (nColumns == b.nRows) {
             int biggestDimension = (int) GeneralMath.maxValue(nRows, nColumns, b.nColumns);
             if (biggestDimension % 2 != 0) biggestDimension++;
