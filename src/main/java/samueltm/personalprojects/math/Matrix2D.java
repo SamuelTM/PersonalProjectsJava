@@ -331,6 +331,49 @@ public class Matrix2D {
         }
     }
 
+    public Matrix2D removeRowAndColumn(int rowIndex, int colIndex) {
+        if (rowIndex >= nRows || colIndex >= nColumns)
+            throw new IllegalArgumentException("Row or column index out of bounds");
+
+        int newDimensionSize = nRows - 1;
+        double[] result = new double[newDimensionSize * newDimensionSize];
+        int originalRowStart = rowIndex * nColumns;
+        int originalRowEnd = originalRowStart + nColumns;
+        int resultIndex = 0;
+
+        for (int i = 0; i < originalRowStart; i += nColumns) {
+            System.arraycopy(flatMatrix, i, result, resultIndex, colIndex);
+            System.arraycopy(flatMatrix, i + colIndex + 1, result,
+                    resultIndex + colIndex, nColumns - colIndex - 1);
+            resultIndex += newDimensionSize;
+        }
+
+        for (int i = originalRowEnd; i < flatMatrix.length; i += nColumns) {
+            System.arraycopy(flatMatrix, i, result, resultIndex, colIndex);
+            System.arraycopy(flatMatrix, i + colIndex + 1, result,
+                    resultIndex + colIndex, nColumns - colIndex - 1);
+            resultIndex += newDimensionSize;
+        }
+
+        return new Matrix2D(result, newDimensionSize, newDimensionSize);
+    }
+
+    public double determinant() {
+        if (!isSquare()) throw new RuntimeException("Only square matrices have determinants");
+        if (nRows == 2) {
+            return (flatMatrix[0] * flatMatrix[3]) - (flatMatrix[1] * flatMatrix[2]);
+        } else if (nRows == 3) {
+            // Thanks to u/robinhouston for this one
+            double a = flatMatrix[0], b = flatMatrix[1], c = flatMatrix[2], d = flatMatrix[3],
+                    e = flatMatrix[4], f = flatMatrix[5], g = flatMatrix[6], h = flatMatrix[7],
+                    i = flatMatrix[8];
+            double D = d * (h - i), E = e * (i - g), F = f * (g - h), G = g * (e - f), H = h * (f - d);
+            return a * (E + F + G) + b * (D + F + H) - c * (F + G + H);
+        } else {
+            throw new UnsupportedOperationException("Haven't implemented this yet");
+        }
+    }
+
     public int[] getShape() {
         return new int[]{nRows, nColumns};
     }
