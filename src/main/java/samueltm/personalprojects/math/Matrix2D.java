@@ -187,31 +187,38 @@ public class Matrix2D {
         }
     }
 
+    private Matrix2D[] getIntermediateMatrices(Matrix2D[] submatricesA, Matrix2D[] submatricesB) {
+        Matrix2D P1 = (submatricesA[0].add(submatricesA[3])).improvedMultiply(submatricesB[0].add(submatricesB[3]));
+        Matrix2D P2 = (submatricesA[2].add(submatricesA[3])).improvedMultiply(submatricesB[0]);
+        Matrix2D P3 = submatricesA[0].improvedMultiply(submatricesB[1].subtract(submatricesB[3]));
+        Matrix2D P4 = submatricesA[3].improvedMultiply(submatricesB[2].subtract(submatricesB[0]));
+        Matrix2D P5 = (submatricesA[0].add(submatricesA[1])).improvedMultiply(submatricesB[3]);
+        Matrix2D P6 = (submatricesA[2].subtract(submatricesA[0])).improvedMultiply(submatricesB[0]
+                .add(submatricesB[1]));
+        Matrix2D P7 = (submatricesA[1].subtract(submatricesA[3])).improvedMultiply(submatricesB[2]
+                .add(submatricesB[3]));
+        return new Matrix2D[]{P1, P2, P3, P4, P5, P6, P7};
+    }
+
+    private Matrix2D[] calculateResultQuadrants(Matrix2D[] intermediateMatrices) {
+        return new Matrix2D[]{
+                intermediateMatrices[0].add(intermediateMatrices[3]).subtract(intermediateMatrices[4])
+                        .add(intermediateMatrices[6]),
+                intermediateMatrices[2].add(intermediateMatrices[4]),
+                intermediateMatrices[1].add(intermediateMatrices[3]),
+                intermediateMatrices[0].subtract(intermediateMatrices[1]).add(intermediateMatrices[2])
+                        .add(intermediateMatrices[5])
+        };
+    }
+
     public Matrix2D coppersmithWinograd(Matrix2D b) {
         if (nColumns == b.nRows) {
             int biggestDimension = (int) GeneralMath.maxValue(nRows, nColumns, b.nColumns);
             if (biggestDimension % 2 != 0) biggestDimension++;
 
             Matrix2D A = squarePad(biggestDimension), B = b.squarePad(biggestDimension);
-
-            Matrix2D[] submatricesA = A.splitIntoQuadrants(), submatricesB = B.splitIntoQuadrants();
-
-            Matrix2D P1 = (submatricesA[0].add(submatricesA[3])).improvedMultiply(submatricesB[0].add(submatricesB[3]));
-            Matrix2D P2 = (submatricesA[2].add(submatricesA[3])).improvedMultiply(submatricesB[0]);
-            Matrix2D P3 = submatricesA[0].improvedMultiply(submatricesB[1].subtract(submatricesB[3]));
-            Matrix2D P4 = submatricesA[3].improvedMultiply(submatricesB[2].subtract(submatricesB[0]));
-            Matrix2D P5 = (submatricesA[0].add(submatricesA[1])).improvedMultiply(submatricesB[3]);
-            Matrix2D P6 = (submatricesA[2].subtract(submatricesA[0])).improvedMultiply(submatricesB[0]
-                    .add(submatricesB[1]));
-            Matrix2D P7 = (submatricesA[1].subtract(submatricesA[3])).improvedMultiply(submatricesB[2]
-                    .add(submatricesB[3]));
-
-            Matrix2D[] resultQuadrants = new Matrix2D[]{
-                    P1.add(P4).subtract(P5).add(P7),
-                    P3.add(P5),
-                    P2.add(P4),
-                    P1.subtract(P2).add(P3).add(P6)
-            };
+            Matrix2D[] intermediateMatrices = getIntermediateMatrices(A.splitIntoQuadrants(), B.splitIntoQuadrants());
+            Matrix2D[] resultQuadrants = calculateResultQuadrants(intermediateMatrices);
 
             int quadrantSize = A.nRows / 2;
             double[] paddedResult = new double[A.nRows * A.nRows];
@@ -225,13 +232,13 @@ public class Matrix2D {
                         + quadrantColIndex];
             }
 
-            double[] result = new double[nRows * b.nColumns];
-            for (int i = 0; i < result.length; i++) {
+            double[] trueResult = new double[nRows * b.nColumns];
+            for (int i = 0; i < trueResult.length; i++) {
                 int rowIndex = i / b.nColumns, colIndex = i % b.nColumns;
-                result[i] = paddedResult[rowIndex * A.nRows + colIndex];
+                trueResult[i] = paddedResult[rowIndex * A.nRows + colIndex];
             }
 
-            return new Matrix2D(result, nRows, b.nColumns);
+            return new Matrix2D(trueResult, nRows, b.nColumns);
         } else {
             throw new IllegalArgumentException("Number of columns of A must be equal to the number of rows of B");
         }
