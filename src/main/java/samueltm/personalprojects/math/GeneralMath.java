@@ -95,7 +95,7 @@ public class GeneralMath {
         return result;
     }
 
-    public static double greatestValue(double... numbers) {
+    public static double maxValue(double... numbers) {
         double greatest = numbers[0];
         for (int i = 1; i < numbers.length; i++) {
             greatest = Math.max(greatest, numbers[i]);
@@ -103,7 +103,7 @@ public class GeneralMath {
         return greatest;
     }
 
-    public static double lowestValue(double... numbers) {
+    public static double minValue(double... numbers) {
         double lowest = numbers[0];
         for (int i = 1; i < numbers.length; i++) {
             lowest = Math.min(lowest, numbers[i]);

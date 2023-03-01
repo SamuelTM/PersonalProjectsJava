@@ -19,7 +19,7 @@ public class MatrixTest {
         return new Benchmarker() {
             @Override
             public void execute() {
-                a.multiply(b);
+                a.classicMultiply(b);
             }
         };
     }
@@ -28,19 +28,28 @@ public class MatrixTest {
         return new Benchmarker() {
             @Override
             public void execute() {
-                a.multiply2(b);
+                a.improvedMultiply(b);
+            }
+        };
+    }
+
+    private static Benchmarker testCopperWinoMultiplication(Matrix2D a, Matrix2D b) {
+        return new Benchmarker() {
+            @Override
+            public void execute() {
+                a.coppersmithWinograd(b);
             }
         };
     }
 
     public static void testMultiplicationAlgorithms() {
-        int m1 = ThreadLocalRandom.current().nextInt(1000, 2000);
-        int m2 = ThreadLocalRandom.current().nextInt(1000, 2000);
-        System.out.println(m1 + "," + m2);
-        int sampleSize = 100;
-        Matrix2D a = generateMatrix(m1, m2);
-        Matrix2D b = generateMatrix(m2, m2);
+        int m = 600, n = 1000, p = 600;
+        int sampleSize = 1;
+        System.out.println("Total elements: " + ((m * n) + (n * p)));
+        Matrix2D a = generateMatrix(m, n);
+        Matrix2D b = generateMatrix(n, p);
         testVanillaMultiplication(a, b).getAverageExecTimeNano("Normal multiplication", sampleSize);
         testImprovedMultiplication(a, b).getAverageExecTimeNano("Improved multiplication", sampleSize);
+        testCopperWinoMultiplication(a, b).getAverageExecTimeNano("Coppersmith-Winograd", sampleSize);
     }
 }

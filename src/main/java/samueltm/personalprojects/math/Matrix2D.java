@@ -7,7 +7,7 @@ public class Matrix2D {
 
     private final double[] flatMatrix;
     private final int nRows, nColumns;
-    private final int[] biggestNumberOfDecimalPlacesInEachColumn;
+    private int[] biggestNumberOfDecimalPlacesInEachColumn;
 
     public Matrix2D(double[] flatMatrix, int nRows, int nColumns) {
         boolean withinLimits = nRows > 0 && nColumns > 0 && nRows <= flatMatrix.length
@@ -17,12 +17,11 @@ public class Matrix2D {
             this.flatMatrix = flatMatrix;
             this.nRows = nRows;
             this.nColumns = nColumns;
-            biggestNumberOfDecimalPlacesInEachColumn = new int[nColumns];
-            getBiggestNumberOfDecimalPlacesInEachColumn();
         } else {
             throw new IllegalArgumentException("Unable to build a matrix with the provided parameters");
         }
     }
+
 
     private void getBiggestNumberOfDecimalPlacesInEachColumn() {
         for (int i = 0; i < flatMatrix.length; i++) {
@@ -37,12 +36,18 @@ public class Matrix2D {
         return flatMatrix[rowIndex * nColumns + columnIndex];
     }
 
-    public Matrix2D sum(Matrix2D b) {
+    public Matrix2D add(Matrix2D b) {
         if (nRows == b.nRows && nColumns == b.nColumns) {
-            double[] numbers = new double[flatMatrix.length];
-            for (int i = 0; i < numbers.length; i++) {
-                numbers[i] = flatMatrix[i] + b.flatMatrix[i];
+            final int length = flatMatrix.length;
+            final double[] numbers = new double[length];
+
+            System.arraycopy(flatMatrix, 0, numbers, 0, length);
+
+            int i = 0;
+            for (double number : b.flatMatrix) {
+                numbers[i++] += number;
             }
+
             return new Matrix2D(numbers, nRows, nColumns);
         } else {
             throw new IllegalArgumentException("Both matrices must have the same size");
@@ -51,10 +56,16 @@ public class Matrix2D {
 
     public Matrix2D subtract(Matrix2D b) {
         if (nRows == b.nRows && nColumns == b.nColumns) {
-            double[] numbers = new double[flatMatrix.length];
-            for (int i = 0; i < numbers.length; i++) {
-                numbers[i] = flatMatrix[i] - b.flatMatrix[i];
+            final int length = flatMatrix.length;
+            final double[] numbers = new double[length];
+
+            System.arraycopy(flatMatrix, 0, numbers, 0, length);
+
+            int i = 0;
+            for (double number : b.flatMatrix) {
+                numbers[i++] -= number;
             }
+
             return new Matrix2D(numbers, nRows, nColumns);
         } else {
             throw new IllegalArgumentException("Both matrices must have the same size");
@@ -63,10 +74,16 @@ public class Matrix2D {
 
     public Matrix2D hadamard(Matrix2D b) {
         if (nRows == b.nRows && nColumns == b.nColumns) {
-            double[] numbers = new double[flatMatrix.length];
-            for (int i = 0; i < numbers.length; i++) {
-                numbers[i] = flatMatrix[i] * b.flatMatrix[i];
+            final int length = flatMatrix.length;
+            final double[] numbers = new double[length];
+
+            System.arraycopy(flatMatrix, 0, numbers, 0, length);
+
+            int i = 0;
+            for (double number : b.flatMatrix) {
+                numbers[i++] *= number;
             }
+
             return new Matrix2D(numbers, nRows, nColumns);
         } else {
             throw new IllegalArgumentException("Both matrices must have the same size");
@@ -77,7 +94,7 @@ public class Matrix2D {
      * Vanilla matrix multiplication algorithm. Each array is accessed
      * m*n^2 times.
      */
-    public Matrix2D multiply(Matrix2D b) {
+    public Matrix2D classicMultiply(Matrix2D b) {
         if (nColumns == b.nRows) {
             double[] numbers = new double[nRows * b.nColumns];
 
@@ -100,22 +117,131 @@ public class Matrix2D {
      * vanilla method accesses the resulting matrix m*n^2 times, this one
      * accesses it only m*n times.
      */
-    public Matrix2D multiply2(Matrix2D b) {
+
+    public Matrix2D improvedMultiply(Matrix2D b) {
         if (nColumns == b.nRows) {
+            Matrix2D bT = b.transpose();
             double[] numbers = new double[nRows * b.nColumns];
             for (int i = 0; i < numbers.length; i++) {
                 int rowIndex = i / b.nColumns;
                 int colIndex = i % b.nColumns;
                 double sum = 0;
                 for (int currentDotProduct = 0; currentDotProduct < b.nRows; currentDotProduct++) {
-                    sum += getElement(rowIndex, currentDotProduct) * b.getElement(currentDotProduct, colIndex);
+                    sum += getElement(rowIndex, currentDotProduct) * bT.getElement(colIndex, currentDotProduct);
                 }
                 numbers[i] = sum;
             }
-
             return new Matrix2D(numbers, nRows, b.nColumns);
         } else {
             throw new IllegalArgumentException("Number of columns of A must be equal to the number of rows of B");
+        }
+    }
+
+    public boolean isSquare() {
+        return nRows == nColumns;
+    }
+
+    private Matrix2D squarePad(int dimensionSize) {
+        if (isSquare() && nRows == dimensionSize) return this;
+
+        if (Math.max(nRows, nColumns) > dimensionSize)
+            throw new IllegalArgumentException("Cannot pad a matrix with a size smaller than its biggest dimension");
+
+        double[] numbers = new double[dimensionSize * dimensionSize];
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < nColumns; j++) {
+                int oldIndex = i * nColumns + j;
+                int newIndex = i * dimensionSize + j;
+                numbers[newIndex] = flatMatrix[oldIndex];
+            }
+        }
+
+        return new Matrix2D(numbers, dimensionSize, dimensionSize);
+    }
+
+    private Matrix2D[] splitIntoQuadrants() {
+        if (isSquare() && nRows % 2 == 0) {
+            int quadrantSize = nRows / 2;
+            double[][] result = new double[4][quadrantSize * quadrantSize];
+
+            for (int i = 0; i < flatMatrix.length; i++) {
+                int rowIndex = i / nColumns;
+                int colIndex = i % nColumns;
+
+                int quadrantRowIndex = rowIndex % quadrantSize;
+                int quadrantColIndex = colIndex % quadrantSize;
+
+                int quadrantIndex = (rowIndex / quadrantSize) * 2 + (colIndex / quadrantSize);
+
+                result[quadrantIndex][quadrantRowIndex * quadrantSize + quadrantColIndex] = flatMatrix[i];
+            }
+
+            return new Matrix2D[]{
+                    new Matrix2D(result[0], quadrantSize, quadrantSize),
+                    new Matrix2D(result[1], quadrantSize, quadrantSize),
+                    new Matrix2D(result[2], quadrantSize, quadrantSize),
+                    new Matrix2D(result[3], quadrantSize, quadrantSize)
+            };
+        } else {
+            throw new RuntimeException("Cannot split a matrix of size " + nRows + "x" + nColumns + " into quadrants");
+        }
+    }
+
+    public Matrix2D coppersmithWinograd(Matrix2D b) {
+        if (nColumns == b.nRows) {
+            int biggestDimension = (int) GeneralMath.maxValue(nRows, nColumns, b.nColumns);
+            if (biggestDimension % 2 != 0) biggestDimension++;
+
+            Matrix2D A = squarePad(biggestDimension), B = b.squarePad(biggestDimension);
+
+            Matrix2D[] submatricesA = A.splitIntoQuadrants(), submatricesB = B.splitIntoQuadrants();
+
+            Matrix2D P1 = (submatricesA[0].add(submatricesA[3])).improvedMultiply(submatricesB[0].add(submatricesB[3]));
+            Matrix2D P2 = (submatricesA[2].add(submatricesA[3])).improvedMultiply(submatricesB[0]);
+            Matrix2D P3 = submatricesA[0].improvedMultiply(submatricesB[1].subtract(submatricesB[3]));
+            Matrix2D P4 = submatricesA[3].improvedMultiply(submatricesB[2].subtract(submatricesB[0]));
+            Matrix2D P5 = (submatricesA[0].add(submatricesA[1])).improvedMultiply(submatricesB[3]);
+            Matrix2D P6 = (submatricesA[2].subtract(submatricesA[0])).improvedMultiply(submatricesB[0]
+                    .add(submatricesB[1]));
+            Matrix2D P7 = (submatricesA[1].subtract(submatricesA[3])).improvedMultiply(submatricesB[2]
+                    .add(submatricesB[3]));
+
+            Matrix2D[] resultQuadrants = new Matrix2D[]{
+                    P1.add(P4).subtract(P5).add(P7),
+                    P3.add(P5),
+                    P2.add(P4),
+                    P1.subtract(P2).add(P3).add(P6)
+            };
+
+            int quadrantSize = A.nRows / 2;
+            double[] paddedResult = new double[A.nRows * A.nRows];
+
+            for (int i = 0; i < paddedResult.length; i++) {
+                int rowIndex = i / A.nRows, colIndex = i % A.nRows;
+                int quadrantRowIndex = rowIndex % quadrantSize, quadrantColIndex = colIndex % quadrantSize;
+                int quadrantIndex = (rowIndex / quadrantSize) * 2 + (colIndex / quadrantSize);
+
+                paddedResult[i] = resultQuadrants[quadrantIndex].flatMatrix[quadrantRowIndex * quadrantSize
+                        + quadrantColIndex];
+            }
+
+            double[] result = new double[nRows * b.nColumns];
+            for (int i = 0; i < result.length; i++) {
+                int rowIndex = i / b.nColumns, colIndex = i % b.nColumns;
+                result[i] = paddedResult[rowIndex * A.nRows + colIndex];
+            }
+
+            return new Matrix2D(result, nRows, b.nColumns);
+        } else {
+            throw new IllegalArgumentException("Number of columns of A must be equal to the number of rows of B");
+        }
+    }
+
+    public Matrix2D multiply(Matrix2D b) {
+        if (isSquare() && Arrays.equals(getShape(), b.getShape()) && nRows >= 1000) {
+            return coppersmithWinograd(b);
+        } else {
+            return improvedMultiply(b);
         }
     }
 
@@ -215,21 +341,22 @@ public class Matrix2D {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final Matrix2D m = (Matrix2D) o;
-        return nRows == m.nRows && nColumns == m.nColumns
-                && Arrays.equals(flatMatrix, m.flatMatrix)
-                && Arrays.equals(biggestNumberOfDecimalPlacesInEachColumn, m.biggestNumberOfDecimalPlacesInEachColumn);
+        return nRows == m.nRows && nColumns == m.nColumns && Arrays.equals(flatMatrix, m.flatMatrix);
     }
 
     @Override
     public int hashCode() {
         int result = Objects.hash(nRows, nColumns);
         result = 31 * result + Arrays.hashCode(flatMatrix);
-        result = 31 * result + Arrays.hashCode(biggestNumberOfDecimalPlacesInEachColumn);
         return result;
     }
 
     @Override
     public String toString() {
+        if (biggestNumberOfDecimalPlacesInEachColumn == null) {
+            biggestNumberOfDecimalPlacesInEachColumn = new int[nColumns];
+            getBiggestNumberOfDecimalPlacesInEachColumn();
+        }
         final StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < flatMatrix.length; i++) {
             final int currentRowIndex = i / nColumns;

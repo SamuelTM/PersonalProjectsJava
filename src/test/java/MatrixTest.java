@@ -6,41 +6,42 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MatrixTest {
 
     @Test
-    public void testarMultiplicacao2() {
-        final int dimensaoMinima = 2, dimensaoMaxima = 100;
-        final int elementoMinimo = 1, elementoMaximo = 11;
-        for (int i = 0; i < 100; i++) {
-            final int m = ThreadLocalRandom.current().nextInt(dimensaoMinima, dimensaoMaxima + 1);
-            final int n = ThreadLocalRandom.current().nextInt(dimensaoMinima, dimensaoMaxima + 1);
-            final int p = ThreadLocalRandom.current().nextInt(dimensaoMinima, dimensaoMaxima + 1);
+    public void testMultiplicationAlgorithm() {
+        final int minDimension = 2, maxDimension = 1000;
+        final int minElement = 1, maxElement = 10;
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (int i = 0; i < 10; i++) {
+            final int m = random.nextInt(minDimension, maxDimension + 1);
+            final int n = random.nextInt(minDimension, maxDimension + 1);
+            final int p = random.nextInt(minDimension, maxDimension + 1);
 
-            final int tamanhoUm = m * n;
+            final int sizeOne = m * n;
 
-            final double[] n1 = new double[tamanhoUm];
-            double[] n2 = new double[tamanhoUm];
+            final double[] n1 = new double[sizeOne];
+            double[] n2 = new double[sizeOne];
 
             if (m == n && n == p) {
-                for (int j = 0; j < tamanhoUm; j++) {
-                    n1[j] = ThreadLocalRandom.current().nextInt(elementoMinimo, elementoMaximo + 1);
-                    n2[j] = ThreadLocalRandom.current().nextInt(elementoMinimo, elementoMaximo + 1);
+                for (int j = 0; j < sizeOne; j++) {
+                    n1[j] = random.nextInt(minElement, maxElement + 1);
+                    n2[j] = random.nextInt(minElement, maxElement + 1);
                 }
             } else {
-                final int tamanhoDois = n * p;
-                n2 = new double[tamanhoDois];
+                final int sizeTwo = n * p;
+                n2 = new double[sizeTwo];
 
-                for (int j = 0; j < tamanhoUm; j++) {
-                    n1[j] = ThreadLocalRandom.current().nextInt(elementoMinimo, elementoMaximo + 1);
+                for (int j = 0; j < sizeOne; j++) {
+                    n1[j] = random.nextInt(minElement, maxElement + 1);
                 }
 
-                for (int j = 0; j < tamanhoDois; j++) {
-                    n2[j] = ThreadLocalRandom.current().nextInt(elementoMinimo, elementoMaximo + 1);
+                for (int j = 0; j < sizeTwo; j++) {
+                    n2[j] = random.nextInt(minElement, maxElement + 1);
                 }
             }
 
             final Matrix2D a = new Matrix2D(n1, m, n);
             final Matrix2D b = new Matrix2D(n2, n, p);
 
-            assert (a.multiply(b).equals(a.multiply2(b)));
+            assert (a.classicMultiply(b).equals(a.coppersmithWinograd(b)));
         }
     }
 }
