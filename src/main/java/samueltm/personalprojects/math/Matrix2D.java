@@ -309,10 +309,7 @@ public class Matrix2D {
 
     public Matrix2D getRow(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < nRows) {
-            double[] numbers = new double[nColumns];
-            for (int i = 0; i < numbers.length; i++) {
-                numbers[i] = getElement(rowIndex, i);
-            }
+            double[] numbers = Arrays.copyOfRange(flatMatrix, rowIndex * nColumns, (rowIndex + 1) * nColumns);
             return new Matrix2D(numbers, 1, nColumns);
         } else {
             throw new IndexOutOfBoundsException("Row index out of bounds");
