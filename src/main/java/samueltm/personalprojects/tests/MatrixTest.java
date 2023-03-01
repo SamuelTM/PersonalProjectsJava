@@ -28,28 +28,17 @@ public class MatrixTest {
         return new Benchmarker() {
             @Override
             public void execute() {
-                a.improvedMultiply(b);
+                a.multiply(b);
             }
         };
     }
-
-    private static Benchmarker testCopperWinoMultiplication(Matrix2D a, Matrix2D b) {
-        return new Benchmarker() {
-            @Override
-            public void execute() {
-                a.coppersmithWinograd(b);
-            }
-        };
-    }
-
     public static void testMultiplicationAlgorithms() {
-        int m = 600, n = 1000, p = 600;
+        int m = 1000, n = 1000, p = 1000;
         int sampleSize = 1;
         System.out.println("Total elements: " + ((m * n) + (n * p)));
         Matrix2D a = generateMatrix(m, n);
         Matrix2D b = generateMatrix(n, p);
         testVanillaMultiplication(a, b).getAverageExecTimeNano("Normal multiplication", sampleSize);
         testImprovedMultiplication(a, b).getAverageExecTimeNano("Improved multiplication", sampleSize);
-        testCopperWinoMultiplication(a, b).getAverageExecTimeNano("Coppersmith-Winograd", sampleSize);
     }
 }
