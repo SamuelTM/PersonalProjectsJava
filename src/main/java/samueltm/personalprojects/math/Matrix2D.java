@@ -253,9 +253,13 @@ public class Matrix2D {
     }
 
     public Matrix2D multiply(double scalar) {
-        double[] numbers = new double[flatMatrix.length];
+        final int length = flatMatrix.length;
+        final double[] numbers = new double[length];
+
+        System.arraycopy(flatMatrix, 0, numbers, 0, length);
+
         for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = flatMatrix[i] * scalar;
+            numbers[i] *= scalar;
         }
         return new Matrix2D(numbers, nRows, nColumns);
     }
