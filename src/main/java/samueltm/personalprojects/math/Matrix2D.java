@@ -170,7 +170,6 @@ public class Matrix2D {
 
                 int quadrantRowIndex = rowIndex % quadrantSize;
                 int quadrantColIndex = colIndex % quadrantSize;
-
                 int quadrantIndex = (rowIndex / quadrantSize) * 2 + (colIndex / quadrantSize);
 
                 result[quadrantIndex][quadrantRowIndex * quadrantSize + quadrantColIndex] = flatMatrix[i];
@@ -187,33 +186,36 @@ public class Matrix2D {
         }
     }
 
-    private Matrix2D[] getIntermediateMatrices(Matrix2D[] submatricesA, Matrix2D[] submatricesB) {
-        Matrix2D P1 = (submatricesA[0].add(submatricesA[3])).improvedMultiply(submatricesB[0].add(submatricesB[3]));
-        Matrix2D P2 = (submatricesA[2].add(submatricesA[3])).improvedMultiply(submatricesB[0]);
-        Matrix2D P3 = submatricesA[0].improvedMultiply(submatricesB[1].subtract(submatricesB[3]));
-        Matrix2D P4 = submatricesA[3].improvedMultiply(submatricesB[2].subtract(submatricesB[0]));
-        Matrix2D P5 = (submatricesA[0].add(submatricesA[1])).improvedMultiply(submatricesB[3]);
-        Matrix2D P6 = (submatricesA[2].subtract(submatricesA[0])).improvedMultiply(submatricesB[0]
-                .add(submatricesB[1]));
-        Matrix2D P7 = (submatricesA[1].subtract(submatricesA[3])).improvedMultiply(submatricesB[2]
-                .add(submatricesB[3]));
+    private Matrix2D[] getIntermediateMatrices(Matrix2D[] quadrantsA, Matrix2D[] quadrantsB) {
+        Matrix2D A11 = quadrantsA[0], A12 = quadrantsA[1], A21 = quadrantsA[2], A22 = quadrantsA[3];
+        Matrix2D B11 = quadrantsB[0], B12 = quadrantsB[1], B21 = quadrantsB[2], B22 = quadrantsB[3];
+
+        Matrix2D P1 = (A11.add(A22)).improvedMultiply(B11.add(B22));
+        Matrix2D P2 = (A21.add(A22)).improvedMultiply(B11);
+        Matrix2D P3 = A11.improvedMultiply(B12.subtract(B22));
+        Matrix2D P4 = A22.improvedMultiply(B21.subtract(B11));
+        Matrix2D P5 = (A11.add(A12)).improvedMultiply(B22);
+        Matrix2D P6 = (A21.subtract(A11)).improvedMultiply(B11.add(B12));
+        Matrix2D P7 = (A12.subtract(A22)).improvedMultiply(B21.add(B22));
+
         return new Matrix2D[]{P1, P2, P3, P4, P5, P6, P7};
     }
 
     private Matrix2D[] calculateResultQuadrants(Matrix2D[] intermediateMatrices) {
+        Matrix2D P1 = intermediateMatrices[0], P2 = intermediateMatrices[1], P3 = intermediateMatrices[2],
+                P4 = intermediateMatrices[3], P5 = intermediateMatrices[4], P6 = intermediateMatrices[5],
+                P7 = intermediateMatrices[6];
         return new Matrix2D[]{
-                intermediateMatrices[0].add(intermediateMatrices[3]).subtract(intermediateMatrices[4])
-                        .add(intermediateMatrices[6]),
-                intermediateMatrices[2].add(intermediateMatrices[4]),
-                intermediateMatrices[1].add(intermediateMatrices[3]),
-                intermediateMatrices[0].subtract(intermediateMatrices[1]).add(intermediateMatrices[2])
-                        .add(intermediateMatrices[5])
+                P1.add(P4).subtract(P5).add(P7),
+                P3.add(P5),
+                P2.add(P4),
+                P1.subtract(P2).add(P3).add(P6)
         };
     }
 
-    private Matrix2D coppersmithWinograd(Matrix2D b) {
+    public Matrix2D coppersmithWinograd(Matrix2D b) {
         if (nColumns == b.nRows) {
-            int biggestDimension = (int) GeneralMath.maxValue(nRows, nColumns, b.nColumns);
+            int biggestDimension = Math.max(Math.max(nRows, nColumns), b.nColumns);
             if (biggestDimension % 2 != 0) biggestDimension++;
 
             Matrix2D A = squarePad(biggestDimension), B = b.squarePad(biggestDimension);
@@ -221,9 +223,10 @@ public class Matrix2D {
             Matrix2D[] resultQuadrants = calculateResultQuadrants(intermediateMatrices);
 
             int quadrantSize = A.nRows / 2;
-            double[] paddedResult = new double[A.nRows * A.nRows];
+            int paddedResultLength = A.nRows * A.nRows;
+            double[] paddedResult = new double[paddedResultLength];
 
-            for (int i = 0; i < paddedResult.length; i++) {
+            for (int i = 0; i < paddedResultLength; i++) {
                 int rowIndex = i / A.nRows, colIndex = i % A.nRows;
                 int quadrantRowIndex = rowIndex % quadrantSize, quadrantColIndex = colIndex % quadrantSize;
                 int quadrantIndex = (rowIndex / quadrantSize) * 2 + (colIndex / quadrantSize);
