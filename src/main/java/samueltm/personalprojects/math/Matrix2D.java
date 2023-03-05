@@ -1,7 +1,12 @@
 package samueltm.personalprojects.math;
 
+import samueltm.personalprojects.miscellaneous.ParallelTask;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.*;
 
 public class Matrix2D {
 
@@ -111,14 +116,31 @@ public class Matrix2D {
         }
     }
 
-    /**
-     * Matrix multiplication algorithm that performs considerably fewer
-     * accesses to the resulting matrix than the vanilla method. While the
-     * vanilla method accesses the resulting matrix m*n^2 times, this one
-     * accesses it only m*n times.
-     */
+    public static void getPartialResult(Matrix2D a, Matrix2D bTransposed, double[] result,
+                                        int startResultElementIndex, int totalResultElements) {
+        if (result.length < 1) throw new IllegalArgumentException("Result array cannot be empty");
+        if (startResultElementIndex < 0 || startResultElementIndex > result.length)
+            throw new IllegalArgumentException("Invalid result element index");
+        if (totalResultElements <= 0) throw new IllegalArgumentException("Invalid number of total result elements");
 
-    private Matrix2D improvedMultiply(Matrix2D b) {
+        int elementsLeft = result.length - startResultElementIndex;
+        if (elementsLeft < totalResultElements) {
+            totalResultElements = elementsLeft;
+        }
+
+        int endResultElementIndex = totalResultElements + startResultElementIndex;
+        for (int i = startResultElementIndex; i < endResultElementIndex; i++) {
+            int rowIndex = i / bTransposed.nRows;
+            int colIndex = i % bTransposed.nRows;
+            double sum = 0;
+            for (int currentDotProduct = 0; currentDotProduct < bTransposed.nColumns; currentDotProduct++) {
+                sum += a.getElement(rowIndex, currentDotProduct) * bTransposed.getElement(colIndex, currentDotProduct);
+            }
+            result[i] = sum;
+        }
+    }
+
+    public Matrix2D improvedMultiplySingleThread(Matrix2D b) {
         if (nColumns == b.nRows) {
             Matrix2D bT = b.transpose();
             double[] numbers = new double[nRows * b.nColumns];
@@ -131,6 +153,47 @@ public class Matrix2D {
                 }
                 numbers[i] = sum;
             }
+            return new Matrix2D(numbers, nRows, b.nColumns);
+        } else {
+            throw new IllegalArgumentException("Number of columns of A must be equal to the number of rows of B");
+        }
+    }
+
+    /**
+     * Matrix multiplication algorithm that performs considerably fewer
+     * accesses to the resulting matrix than the vanilla method. While the
+     * vanilla method accesses the resulting matrix m*n^2 times, this one
+     * accesses it only m*n times.
+     */
+    public Matrix2D improvedMultiply(Matrix2D b) {
+        if (nColumns == b.nRows) {
+            Matrix2D bT = b.transpose();
+            double[] numbers = new double[nRows * b.nColumns];
+            List<Runnable> tasks = new ArrayList<>();
+
+            double ratio = 1;
+            if (numbers.length >= 10000 && numbers.length < 22500) {
+                ratio = 0.09;
+            } else if (numbers.length >= 22500) {
+                ratio = 0.03;
+            }
+
+            int elementsPerThread = (int) Math.ceil(numbers.length * ratio);
+
+            for (int resultElementIndex = 0; resultElementIndex < numbers.length;
+                 resultElementIndex += elementsPerThread) {
+                int finalElementIndex = resultElementIndex;
+                tasks.add(() -> {
+                    getPartialResult(this, bT, numbers, finalElementIndex, elementsPerThread);
+                });
+            }
+
+            ForkJoinPool pool = new ForkJoinPool();
+            ParallelTask task = new ParallelTask(tasks);
+            pool.invoke(task);
+
+            pool.shutdown();
+
             return new Matrix2D(numbers, nRows, b.nColumns);
         } else {
             throw new IllegalArgumentException("Number of columns of A must be equal to the number of rows of B");
@@ -186,22 +249,50 @@ public class Matrix2D {
         }
     }
 
-    private Matrix2D[] getIntermediateMatrices(Matrix2D[] quadrantsA, Matrix2D[] quadrantsB) {
+    private void partialIntermediateMatrices(Matrix2D[] quadrantsA, Matrix2D[] quadrantsB, Matrix2D[] result,
+                                             int taskIndex) {
         Matrix2D A11 = quadrantsA[0], A12 = quadrantsA[1], A21 = quadrantsA[2], A22 = quadrantsA[3];
         Matrix2D B11 = quadrantsB[0], B12 = quadrantsB[1], B21 = quadrantsB[2], B22 = quadrantsB[3];
-
-        Matrix2D P1 = (A11.add(A22)).improvedMultiply(B11.add(B22));
-        Matrix2D P2 = (A21.add(A22)).improvedMultiply(B11);
-        Matrix2D P3 = A11.improvedMultiply(B12.subtract(B22));
-        Matrix2D P4 = A22.improvedMultiply(B21.subtract(B11));
-        Matrix2D P5 = (A11.add(A12)).improvedMultiply(B22);
-        Matrix2D P6 = (A21.subtract(A11)).improvedMultiply(B11.add(B12));
-        Matrix2D P7 = (A12.subtract(A22)).improvedMultiply(B21.add(B22));
-
-        return new Matrix2D[]{P1, P2, P3, P4, P5, P6, P7};
+        switch (taskIndex) {
+            case 0:
+                result[0] = (A11.add(A22)).improvedMultiply(B11.add(B22));
+                result[1] = (A21.add(A22)).improvedMultiply(B11);
+                result[2] = A11.improvedMultiply(B12.subtract(B22));
+                break;
+            case 1:
+                result[3] = A22.improvedMultiply(B21.subtract(B11));
+                result[4] = (A11.add(A12)).improvedMultiply(B22);
+                break;
+            case 2:
+                result[6] = (A12.subtract(A22)).improvedMultiply(B21.add(B22));
+                result[5] = (A21.subtract(A11)).improvedMultiply(B11.add(B12));
+                break;
+        }
     }
 
-    private Matrix2D[] calculateResultQuadrants(Matrix2D[] intermediateMatrices) {
+    private Matrix2D[] getIntermediateMatrices(Matrix2D[] quadrantsA, Matrix2D[] quadrantsB) {
+        Matrix2D[] result = new Matrix2D[7];
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Future<?>> tasks = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            int finalI = i;
+            tasks.add(executor.submit(() -> {
+                partialIntermediateMatrices(quadrantsA, quadrantsB, result, finalI);
+            }));
+        }
+        try {
+            for (Future<?> task : tasks) {
+                task.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        executor.shutdown();
+
+        return result;
+    }
+
+    private static Matrix2D[] calculateResultQuadrants(Matrix2D[] intermediateMatrices) {
         Matrix2D P1 = intermediateMatrices[0], P2 = intermediateMatrices[1], P3 = intermediateMatrices[2],
                 P4 = intermediateMatrices[3], P5 = intermediateMatrices[4], P6 = intermediateMatrices[5],
                 P7 = intermediateMatrices[6];
@@ -387,7 +478,9 @@ public class Matrix2D {
     }
 
     public Matrix2D copy() {
-        return new Matrix2D(flatMatrix, nRows, nColumns);
+        double[] flatMatrixCopy = new double[flatMatrix.length];
+        System.arraycopy(flatMatrix, 0, flatMatrixCopy, 0, flatMatrix.length);
+        return new Matrix2D(flatMatrixCopy, nRows, nColumns);
     }
 
     @Override
